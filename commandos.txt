@@ -2,3 +2,5 @@ nasm -f elf32 parte1.asm -o parte1.o
 
 
 ld -m elf_i386 parte1.o -o parte1
+
+./parte1

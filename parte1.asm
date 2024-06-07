@@ -180,14 +180,28 @@ option_triangle:
 
     mov [height_val], eax ; Guardar el valor convertido
 
-   ; Calcular el área del triángulo
+        ; Calcular el área del triángulo
     mov eax, [base_val]
     imul eax, [height_val]
-    mov ebx, 2
-    xor edx, edx          ; Limpiar edx antes de la división
-    idiv ebx              ; Dividir por 2
 
-    mov [area], eax       ; Guardar el área en [area]
+    ; Verificar si el resultado de la multiplicación es un número par o impar
+    test eax, 1      ; Comprobar si el bit menos significativo está encendido
+    jnz .odd_result  ; Si es impar, saltar a .odd_result
+
+    ; Si el resultado es par, entonces la división por 2 puede realizarse sin problemas
+    mov ebx, 2
+    xor edx, edx    ; Limpiar edx antes de la división
+    idiv ebx        ; Dividir por 2
+    jmp .area_calculated  ; Saltar al final del cálculo del área
+
+    .odd_result:
+    mov ebx, 2
+    xor edx, edx    ; Limpiar edx antes de la división
+    idiv ebx        ; Dividir por 2
+    inc eax         ; Sumar 1 al resultado de la división
+
+    .area_calculated:
+    mov [area], eax ; Guardar el área en [area]
 
 
     ; Mostrar el resultado
