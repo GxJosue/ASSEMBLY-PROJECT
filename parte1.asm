@@ -30,6 +30,7 @@ section .bss
     length resd 1
     width resd 1
     area resd 1
+    num_buffer resb 12  ; Buffer para convertir número a string
 
 section .text
     global _start
@@ -158,7 +159,7 @@ convert_loop:
     cmp bl, 0xA
     je convert_end
     sub bl, '0'
-    imul eax, 10
+    imul eax, eax, 10
     add eax, ebx
     inc ecx
     jmp convert_loop
@@ -169,25 +170,23 @@ print_num:
     ; Imprimir un número
     mov ecx, 10
     xor edx, edx
+    mov edi, num_buffer + 11 ; Punto de inicio del buffer
+    mov byte [edi], 0 ; Añadir terminador null
 
 print_num_loop:
     xor edx, edx
     div ecx
     add dl, '0'
-    push dx
+    dec edi
+    mov [edi], dl
     test eax, eax
     jnz print_num_loop
 
-print_num_output:
-    pop dx
-    mov [input], dl
-    mov edx, 1
-    mov ecx, input
+    ; Mostrar número
+    mov edx, num_buffer + 11
+    sub edx, edi
+    mov ecx, edi
     mov ebx, 1
     mov eax, 4
     int 0x80
-    cmp esp, input
-    jnz print_num_output
     ret
-
-    ;funciona todo good, solo da unos caracteres de más en la respuesta
