@@ -189,3 +189,5 @@ print_num_output:
     cmp esp, input
     jnz print_num_output
     ret
+
+    ;funciona todo good, solo da unos caracteres de más en la respuesta
