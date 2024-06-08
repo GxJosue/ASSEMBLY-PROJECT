@@ -237,3 +237,9 @@ print_decimal_loop:
     mov eax, 4
     int 0x80
     ret
+
+    ;Proyecto 4: Calculo de areas de formas geometricas
+    ;Integrantes: 
+    ;Josue Edenilson Martínez Flores - MF22036
+    ;Gabriel Alexander Calderón Villeda - CV22022
+    ;Jeffrey Jabes Juarez Mangandi - JM21008
