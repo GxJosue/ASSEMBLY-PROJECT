@@ -29,4 +29,6 @@ ld -m elf_i386 proyecto.o -o proyecto
 ## Alumnos
 
 - [Gabriel Alexander Calderón Villeda - CV22022](https://github.com/ga-b0)
+- [Josué Edenilson Martínez Flores - MF22036](https://github.com/GxJosue)
+- [Jeffrey Jabes Juarez Mangandi - JM21008](xd)
 
