@@ -30,27 +30,24 @@ section .bss
     length resd 1
     width resd 1
     area resd 1
-    num_buffer resb 12  ; Buffer para convertir número a string
+    num_buffer resb 12 
 
 section .text
     global _start
 
 _start:
-    ; Mostrar menú
     mov edx, len_menu
     mov ecx, menu
     mov ebx, 1
     mov eax, 4
     int 0x80
 
-    ; Leer opción
     mov edx, 2
     mov ecx, option
     mov ebx, 0
     mov eax, 3
     int 0x80
 
-    ; Comparar opción
     mov al, [option]
     cmp al, '1'
     je triangle_area
@@ -59,77 +56,69 @@ _start:
     jmp exit
 
 triangle_area:
-    ; Pedir base del triángulo
     mov edx, len_triangle_base_msg
     mov ecx, triangle_base_msg
     mov ebx, 1
     mov eax, 4
     int 0x80
 
-    ; Leer base del triángulo
     call read_input
     mov [base], eax
 
-    ; Pedir altura del triángulo
     mov edx, len_triangle_height_msg
     mov ecx, triangle_height_msg
     mov ebx, 1
     mov eax, 4
     int 0x80
 
-    ; Leer altura del triángulo
     call read_input
     mov [height], eax
 
-    ; Calcular área: (base * altura) / 2
     mov eax, [base]
     imul eax, [height]
-    shr eax, 1
+    imul eax, 100
+    mov ebx, 2
+    div ebx
     mov [area], eax
 
     jmp display_result
 
 rectangle_area:
-    ; Pedir longitud del rectángulo
+
     mov edx, len_rectangle_length_msg
     mov ecx, rectangle_length_msg
     mov ebx, 1
     mov eax, 4
     int 0x80
 
-    ; Leer longitud del rectángulo
     call read_input
     mov [length], eax
 
-    ; Pedir ancho del rectángulo
     mov edx, len_rectangle_width_msg
     mov ecx, rectangle_width_msg
     mov ebx, 1
     mov eax, 4
     int 0x80
 
-    ; Leer ancho del rectángulo
     call read_input
     mov [width], eax
 
-    ; Calcular área: longitud * ancho
     mov eax, [length]
     imul eax, [width]
+    imul eax, 100
     mov [area], eax
 
 display_result:
-    ; Mostrar mensaje del resultado
+
     mov edx, len_result_msg
     mov ecx, result_msg
     mov ebx, 1
     mov eax, 4
     int 0x80
 
-    ; Mostrar área
     mov eax, [area]
-    call print_num
+    call print_num_with_decimals
 
-    ; Agregar nueva línea
     mov edx, 1
     mov ecx, newline
     mov ebx, 1
@@ -137,20 +126,20 @@ display_result:
     int 0x80
 
 exit:
-    ; Salir del programa
+
     mov eax, 1
     xor ebx, ebx
     int 0x80
 
 read_input:
-    ; Leer un número del input
+
     mov edx, 4
     mov ecx, input
     mov ebx, 0
     mov eax, 3
     int 0x80
 
-    ; Convertir string a número
+
     mov eax, 0
     mov ecx, input
     mov edx, 0
@@ -166,12 +155,18 @@ convert_loop:
 convert_end:
     ret
 
-print_num:
-    ; Imprimir un número
+print_num_with_decimals:
+
+    mov ebx, 100
+    xor edx, edx
+    div ebx  ; EAX = parte entera, EDX = parte decimal
+
+    push edx
+
     mov ecx, 10
     xor edx, edx
-    mov edi, num_buffer + 11 ; Punto de inicio del buffer
-    mov byte [edi], 0 ; Añadir terminador null
+    mov edi, num_buffer + 11
+    mov byte [edi], 0
 
 print_num_loop:
     xor edx, edx
@@ -182,7 +177,45 @@ print_num_loop:
     test eax, eax
     jnz print_num_loop
 
-    ; Mostrar número
+    mov edx, num_buffer + 11
+    sub edx, edi
+    mov ecx, edi
+    mov ebx, 1
+    mov eax, 4
+    int 0x80
+
+    mov edx, 1
+    mov ecx, '.'
+    mov [input], cl
+    mov ecx, input
+    mov ebx, 1
+    mov eax, 4
+    int 0x80
+
+    pop eax
+    mov ecx, 10
+    xor edx, edx
+    mov edi, num_buffer + 11
+    mov byte [edi], 0
+
+    mov dx, ax
+    cmp dx, 10
+    jb single_digit_decimal
+    jmp print_decimal_loop
+
+single_digit_decimal:
+    mov byte [edi-1], '0'
+    dec edi
+
+print_decimal_loop:
+    xor edx, edx
+    div ecx
+    add dl, '0'
+    dec edi
+    mov [edi], dl
+    test eax, eax
+    jnz print_decimal_loop
+
     mov edx, num_buffer + 11
     sub edx, edi
     mov ecx, edi
