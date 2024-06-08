@@ -36,18 +36,21 @@ section .text
     global _start
 
 _start:
+    ; Mostrar el menú al usuario
     mov edx, len_menu
     mov ecx, menu
     mov ebx, 1
     mov eax, 4
     int 0x80
 
+    ; Leer la opción del usuario
     mov edx, 2
     mov ecx, option
     mov ebx, 0
     mov eax, 3
     int 0x80
 
+    ; Evaluar la opción del usuario
     mov al, [option]
     cmp al, '1'
     je triangle_area
@@ -56,6 +59,7 @@ _start:
     jmp exit
 
 triangle_area:
+    ; Pedir y leer la base del triángulo
     mov edx, len_triangle_base_msg
     mov ecx, triangle_base_msg
     mov ebx, 1
@@ -65,6 +69,7 @@ triangle_area:
     call read_input
     mov [base], eax
 
+    ; Pedir y leer la altura del triángulo
     mov edx, len_triangle_height_msg
     mov ecx, triangle_height_msg
     mov ebx, 1
@@ -74,6 +79,7 @@ triangle_area:
     call read_input
     mov [height], eax
 
+    ; Calcular el área del triángulo (base * altura / 2)
     mov eax, [base]
     imul eax, [height]
     imul eax, 100
@@ -84,7 +90,7 @@ triangle_area:
     jmp display_result
 
 rectangle_area:
-
+    ; Pedir y leer la longitud del rectángulo
     mov edx, len_rectangle_length_msg
     mov ecx, rectangle_length_msg
     mov ebx, 1
@@ -94,6 +100,7 @@ rectangle_area:
     call read_input
     mov [length], eax
 
+    ; Pedir y leer el ancho del rectángulo
     mov edx, len_rectangle_width_msg
     mov ecx, rectangle_width_msg
     mov ebx, 1
@@ -103,22 +110,25 @@ rectangle_area:
     call read_input
     mov [width], eax
 
+    ; Calcular el área del rectángulo (longitud * ancho)
     mov eax, [length]
     imul eax, [width]
     imul eax, 100
     mov [area], eax
 
 display_result:
-
+    ; Mostrar el mensaje de resultado
     mov edx, len_result_msg
     mov ecx, result_msg
     mov ebx, 1
     mov eax, 4
     int 0x80
 
+    ; Mostrar el área calculada
     mov eax, [area]
     call print_num_with_decimals
 
+    ; Imprimir una nueva línea
     mov edx, 1
     mov ecx, newline
     mov ebx, 1
@@ -126,19 +136,18 @@ display_result:
     int 0x80
 
 exit:
-
+    ; Salir del programa
     mov eax, 1
     xor ebx, ebx
     int 0x80
 
 read_input:
-
+    ; Leer la entrada del usuario y convertirla de ASCII a número
     mov edx, 4
     mov ecx, input
     mov ebx, 0
     mov eax, 3
     int 0x80
-
 
     mov eax, 0
     mov ecx, input
@@ -156,13 +165,14 @@ convert_end:
     ret
 
 print_num_with_decimals:
-
+    ; Imprimir un número con dos decimales
     mov ebx, 100
     xor edx, edx
-    div ebx  ; EAX = parte entera, EDX = parte decimal
+    div ebx
 
     push edx
 
+    ; Convertir la parte entera a ASCII
     mov ecx, 10
     xor edx, edx
     mov edi, num_buffer + 11
@@ -177,6 +187,7 @@ print_num_loop:
     test eax, eax
     jnz print_num_loop
 
+    ; Imprimir la parte entera
     mov edx, num_buffer + 11
     sub edx, edi
     mov ecx, edi
@@ -184,6 +195,7 @@ print_num_loop:
     mov eax, 4
     int 0x80
 
+    ; Imprimir el punto decimal
     mov edx, 1
     mov ecx, '.'
     mov [input], cl
@@ -192,6 +204,7 @@ print_num_loop:
     mov eax, 4
     int 0x80
 
+    ; Convertir la parte decimal a ASCII
     pop eax
     mov ecx, 10
     xor edx, edx
@@ -216,6 +229,7 @@ print_decimal_loop:
     test eax, eax
     jnz print_decimal_loop
 
+    ; Imprimir la parte decimal
     mov edx, num_buffer + 11
     sub edx, edi
     mov ecx, edi
